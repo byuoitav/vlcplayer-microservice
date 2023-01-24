@@ -14,7 +14,6 @@ type Handlers struct {
 
 func (h *Handlers) PlayStream(c *gin.Context) {
 	stramURL := c.Param("streamURL")
-	var args []string
 
 	stramURL, err := url.QueryUnescape(stramURL)
 	if err != nil {
@@ -33,9 +32,12 @@ func (h *Handlers) checkStream() bool {
 }
 
 func (h *Handlers) StopStream(c *gin.Context) {
-	var args []string
+
 }
 
 func (h *Handlers) GetStream(c *gin.Context) {
-	var args []string
+
+	c.JSON(http.StatusInternalServerError, "Stream player is not running or is not ready to receive commands")
+	fmt.Errorf("Stream player is not running or is not ready to receive commands")
+	return
 }

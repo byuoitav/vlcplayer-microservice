@@ -1,9 +1,6 @@
 package cache
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/byuoitav/vlcplayer-microservice/data"
 	bolt "go.etcd.io/bbolt"
 )
@@ -13,7 +10,7 @@ type configService struct {
 	db            *bolt.DB
 }
 
-func (c *configService) GetStreamConfig(ctx context.Context, streamURL string) (data.ConfigService, error) {
+/*func (c *configService) GetStreamConfig(ctx context.Context, streamURL string) (data.ConfigService, error) {
 
 	db, err := bolt.Open(streamURL, 0600, nil)
 	if err != nil {
@@ -35,8 +32,4 @@ func (c *configService) GetStreamConfig(ctx context.Context, streamURL string) (
 		return nil, fmt.Errorf("unable to create bucket: %w", err)
 	}
 
-	return &configService{
-		configService: cs,
-		db:            db,
-	}, nil
-}
+}*/

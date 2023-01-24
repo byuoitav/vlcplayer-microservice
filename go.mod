@@ -8,6 +8,8 @@ require (
 	go.uber.org/zap v1.24.0
 )
 
+require github.com/adrg/libvlc-go/v3 v3.1.5
+
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect

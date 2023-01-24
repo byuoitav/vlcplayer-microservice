@@ -1,52 +1,123 @@
 package helpers
 
-const ()
+import (
+	"log"
+
+	vlc "github.com/adrg/libvlc-go/v3"
+)
 
 // GetStream returns the url of the srteam currently playing
 
-func GetStream() (string, error) {
+func GetStream(player *vlc.Player) (string, error) {
+	var stream string
+	media, err := player.Media()
+	if err != nil {
+		log.Printf("error getting media: %s", err)
+		return "", err
+	}
+	stream, err = media.Location()
+	if err != nil {
+		log.Printf("error getting stream: %s", err)
+		return "", err
+	}
 
-	return "", nil
+	return stream, nil
 }
 
 // GetPlaybackStatus returns the status of the player
 
-func GetPlaybackStatus() (string, error) {
+func GetPlaybackStatus(player *vlc.Player) (string, error) {
 
-	return "", nil
+	playing := player.IsPlaying()
+	state := player.WillPlay()
+
+	if playing {
+		return "playing", nil
+	} else if state {
+		return "media not finished or in error", nil
+	} else {
+		return "error playing media", nil
+	}
 }
 
 // StopStream quits the vlc player
 
-func StopStream() error {
+func StopStream(player *vlc.Player) error {
 
+	err := player.Stop()
+	if err != nil {
+		log.Printf("error stopping player: %s", err)
+		return err
+	}
 	return nil
 }
 
 // SwitchStream switches the player output to a new stream
 
-func SwitchStream(stream string) error {
+func SwitchStream(player *vlc.Player, stream string) error {
+
+	media, err := player.LoadMediaFromURL(stream)
+	if err != nil {
+		log.Printf("error loading media: %s", err)
+		return err
+	}
+	defer media.Release()
+
+	err = player.Play()
+	if err != nil {
+		log.Printf("error playing media: %s", err)
+		return err
+	}
 
 	return nil
 }
 
-// VolumeControl always returns the current volume and optionally can change the volume
+// Volume returns the current volume level
 
-func VolumeControl(volume int) (int, error) {
+func Volume(player *vlc.Player) (int, error) {
 
-	return 0, nil
+	volume, err := player.Volume()
+	if err != nil {
+		log.Printf("error getting volume: %s", err)
+		return 0, err
+	}
+
+	return volume, nil
+}
+
+// SetVolume sets the volume level
+func SetVolume(player *vlc.Player, volume int) error {
+
+	err := player.SetVolume(volume)
+	if err != nil {
+		log.Printf("error setting volume: %s", err)
+		return err
+	}
+	return nil
 }
 
 // Mute mutes the current player output
 
-func Mute() error {
+func Mute(player *vlc.Player) error {
+
+	err := player.SetMute(true)
+	if err != nil {
+		log.Printf("error muting player: %s", err)
+		return err
+	}
 
 	return nil
 }
 
 // Unmute unmutes the current player output
 
-func Unmute() error {
+func Unmute(player *vlc.Player) error {
+
+	err := player.SetMute(false)
+	if err != nil {
+		log.Printf("error unmuting player: %s", err)
+		return err
+	}
 
 	return nil
 }

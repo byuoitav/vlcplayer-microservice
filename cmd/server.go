@@ -17,9 +17,10 @@ func main() {
 
 	port = ":" + port
 
-	manager := device.DeviceManager{
-		Log: buildLogger(logLevel),
-	}
+	/*
+		manager := device.DeviceManager{
+			Log: buildLogger(logLevel),
+		}*/
 
 	router := gin.Default()
 	router.GET("/ping", func(c *gin.Context) {
@@ -34,5 +35,5 @@ func main() {
 		})
 	})
 
-	manager.Run(router, port)
+	//manager.Run(router, port)
 }
