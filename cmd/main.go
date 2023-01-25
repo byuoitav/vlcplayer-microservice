@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/byuoitav/vlcplayer-microservice/vlc"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
 )
@@ -17,10 +18,9 @@ func main() {
 
 	port = ":" + port
 
-	/*
-		manager := device.DeviceManager{
-			Log: buildLogger(logLevel),
-		}*/
+	manager := vlc.VlcManager{
+		Log: buildLogger(logLevel),
+	}
 
 	router := gin.Default()
 	router.GET("/ping", func(c *gin.Context) {
@@ -35,5 +35,5 @@ func main() {
 		})
 	})
 
-	//manager.Run(router, port)
+	manager.RunHTTPServer(router, port)
 }

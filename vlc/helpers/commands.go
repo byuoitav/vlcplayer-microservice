@@ -56,6 +56,12 @@ func StopStream(player *vlc.Player) error {
 
 func SwitchStream(player *vlc.Player, stream string) error {
 
+	/*player, err = StartVLC()
+	if err != nil {
+		log.Printf("error starting vlc: %s", err)
+		return err
+	}*/
+
 	media, err := player.LoadMediaFromURL(stream)
 	if err != nil {
 		log.Printf("error loading media: %s", err)
