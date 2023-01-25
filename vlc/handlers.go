@@ -1,12 +1,12 @@
 package vlc
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 
 	"github.com/byuoitav/vlcplayer-microservice/vlc/helpers"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type Handlers struct {
@@ -14,24 +14,25 @@ type Handlers struct {
 }
 
 func (v *VlcManager) PlayStream(c *gin.Context) {
+	v.Log.Debug("playing stream", zap.String("streamURL", c.Param("streamURL")))
 	streamURL := c.Param("streamURL")
 
 	streamURL, err := url.QueryUnescape(streamURL)
 	if err != nil {
+		v.Log.Warn("failed to unescape stream url", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, err)
-		//fmt.Errorf("error getting stream URL: %v", err)
 		return
 	}
 	vlcPlayer, err := helpers.StartVLC()
 	if err != nil {
+		v.Log.Warn("failed to start vlc player", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, err)
-		//fmt.Errorf("error starting VLC: %s", err)
 		return
 	}
 	err = helpers.SwitchStream(vlcPlayer, streamURL)
 	if err != nil {
+		v.Log.Warn("failed to switch stream", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, err)
-		//fmt.Errorf("error switching stream: %s", err)
 		return
 	}
 	c.JSON(http.StatusOK, "stream playing")
@@ -39,24 +40,32 @@ func (v *VlcManager) PlayStream(c *gin.Context) {
 
 // StopStream stops the stream that is currently playing
 func (v *VlcManager) StopStream(c *gin.Context) {
-	log.Println("Stopping stream player...")
+	v.Log.Debug("stopping stream player")
+
+	//err := helpers.StopStream(vlcPlayer)
 
 }
 
 // GetStream returns the stream that is currently playing
 func (v *VlcManager) GetStream(c *gin.Context) {
-	log.Println("Getting stream...")
+	v.Log.Debug("getting stream player")
+
+	//stream, err := helpers.GetStream(vlcPlayer)
 
 }
 
 // GetStatus returns the status of the stream player
 func (v *VlcManager) GetStatus(c *gin.Context) {
-	log.Println("Getting status...")
+	v.Log.Debug("getting status of stream player")
+
+	//status, err := helpers.GetPlaybackStatus(vlcPlayer)
 
 }
 
 // SetVolume sets the volume of the stream player
 func (v *VlcManager) SetVolume(c *gin.Context) {
-	log.Println("Setting volume...")
+	v.Log.Debug("setting volume of stream player")
+
+	//volume, err := helpers.SetVolume(vlcPlayer, c.Param("volume"))
 
 }
