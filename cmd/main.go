@@ -5,6 +5,7 @@ import (
 
 	"github.com/byuoitav/vlcplayer-microservice/vlc"
 	"github.com/gin-gonic/gin"
+
 	"github.com/spf13/pflag"
 )
 
@@ -13,7 +14,7 @@ func main() {
 	var port, logLevel string
 
 	pflag.StringVarP(&port, "port", "p", "9013", "port for microservice to av-api communication")
-	pflag.StringVarP(&logLevel, "log-level", "l", "info", "log level for microservice")
+	pflag.StringVarP(&logLevel, "log", "l", "Info", "log level for microservice")
 	pflag.Parse()
 
 	port = ":" + port

@@ -20,8 +20,10 @@ func (v *VlcManager) RunHTTPServer(router *gin.Engine, port string) error {
 	vlc.GET("/play/:streamURL", v.PlayStream)
 	vlc.GET("/stop", v.StopStream)
 	vlc.GET("/status", v.GetStatus)
-	vlc.GET("/volume", v.SetVolume)
 	vlc.GET("/stream", v.GetStream)
+	vlc.GET("/volume", v.GetVolume)
+	vlc.GET("/mute", v.MuteStream)
+	vlc.GET("/unmute", v.UnmuteStream)
 
 	server := &http.Server{
 		Addr:           port,

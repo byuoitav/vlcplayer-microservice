@@ -49,18 +49,13 @@ func StopStream(player *vlc.Player) error {
 		log.Printf("error stopping player: %s", err)
 		return err
 	}
+	player.Release()
 	return nil
 }
 
 // SwitchStream switches the player output to a new stream
 
 func SwitchStream(player *vlc.Player, stream string) error {
-
-	/*player, err = StartVLC()
-	if err != nil {
-		log.Printf("error starting vlc: %s", err)
-		return err
-	}*/
 
 	media, err := player.LoadMediaFromURL(stream)
 	if err != nil {
