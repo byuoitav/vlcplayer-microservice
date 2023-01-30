@@ -13,7 +13,7 @@ import (
 
 var Player *vlc.Player
 
-func (v *VlcManager) StartVLC() (*vlc.Player, error) {
+func (v *VlcManager) startVLC() (*vlc.Player, error) {
 	v.Log.Debug("starting vlc player")
 
 	player, err := helpers.StartVLC()
@@ -25,7 +25,7 @@ func (v *VlcManager) StartVLC() (*vlc.Player, error) {
 	return player, nil
 }
 
-func (v *VlcManager) PlayStream(c *gin.Context) {
+func (v *VlcManager) playStream(c *gin.Context) {
 	v.Log.Debug("playing stream", zap.String("streamURL", c.Param("streamURL")))
 	streamURL := c.Param("streamURL")
 
@@ -55,7 +55,7 @@ func (v *VlcManager) PlayStream(c *gin.Context) {
 }
 
 // StopStream stops the stream that is currently playing
-func (v *VlcManager) StopStream(c *gin.Context) {
+func (v *VlcManager) stopStream(c *gin.Context) {
 	v.Log.Debug("stopping stream player")
 	if Player == nil {
 		v.Log.Warn("no stream to stop")
@@ -73,7 +73,7 @@ func (v *VlcManager) StopStream(c *gin.Context) {
 }
 
 // GetStream returns the stream that is currently playing
-func (v *VlcManager) GetStream(c *gin.Context) {
+func (v *VlcManager) getStream(c *gin.Context) {
 	v.Log.Debug("getting stream player")
 	if Player == nil {
 		v.Log.Warn("no stream to get")
@@ -90,7 +90,7 @@ func (v *VlcManager) GetStream(c *gin.Context) {
 }
 
 // GetStatus returns the status of the stream player
-func (v *VlcManager) GetStatus(c *gin.Context) {
+func (v *VlcManager) getStatus(c *gin.Context) {
 	v.Log.Debug("getting status of stream player")
 	if Player == nil {
 		v.Log.Warn("no stream to get status of")
@@ -107,7 +107,7 @@ func (v *VlcManager) GetStatus(c *gin.Context) {
 }
 
 // SetVolume sets the volume of the stream player
-func (v *VlcManager) SetVolume(c *gin.Context) {
+func (v *VlcManager) setVolume(c *gin.Context) {
 	v.Log.Debug("setting volume of stream player")
 	if Player == nil {
 		v.Log.Warn("no stream to set volume of")
@@ -131,7 +131,7 @@ func (v *VlcManager) SetVolume(c *gin.Context) {
 }
 
 // GetVolume returns the volume of the stream player
-func (v *VlcManager) GetVolume(c *gin.Context) {
+func (v *VlcManager) getVolume(c *gin.Context) {
 	v.Log.Debug("getting volume of stream player")
 	if Player == nil {
 		v.Log.Warn("no stream to get volume of")
@@ -148,7 +148,7 @@ func (v *VlcManager) GetVolume(c *gin.Context) {
 }
 
 // MuteStream mutes the stream that is currently playing
-func (v *VlcManager) MuteStream(c *gin.Context) {
+func (v *VlcManager) muteStream(c *gin.Context) {
 	v.Log.Debug("muting stream player")
 	if Player == nil {
 		v.Log.Warn("no stream to mute")
@@ -165,7 +165,7 @@ func (v *VlcManager) MuteStream(c *gin.Context) {
 }
 
 // UnmuteStream unmutes the stream that is currently playing
-func (v *VlcManager) UnmuteStream(c *gin.Context) {
+func (v *VlcManager) unmuteStream(c *gin.Context) {
 	v.Log.Debug("unmuting stream player")
 	if Player == nil {
 		v.Log.Warn("no stream to unmute")
