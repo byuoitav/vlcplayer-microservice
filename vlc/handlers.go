@@ -2,7 +2,6 @@ package vlc
 
 import (
 	"net/http"
-	"net/url"
 	"strconv"
 
 	vlc "github.com/adrg/libvlc-go/v3"
@@ -12,6 +11,10 @@ import (
 )
 
 var Player *vlc.Player
+
+type StreamURL struct {
+	URL string `json:"url"`
+}
 
 func (v *VlcManager) startVLC() (*vlc.Player, error) {
 	v.Log.Debug("starting vlc player")
@@ -26,15 +29,16 @@ func (v *VlcManager) startVLC() (*vlc.Player, error) {
 }
 
 func (v *VlcManager) playStream(c *gin.Context) {
-	v.Log.Debug("playing stream", zap.String("streamURL", c.Param("streamURL")))
-	streamURL := c.Param("streamURL")
+	v.Log.Debug("playing stream")
 
-	streamURL, err := url.QueryUnescape(streamURL)
+	var stream StreamURL
+	err := c.ShouldBindJSON(&stream)
 	if err != nil {
-		v.Log.Warn("failed to unescape stream url", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, err)
+		v.Log.Warn("failed to bind json", zap.Error(err))
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	vlcPlayer, err := helpers.StartVLC()
 	if err != nil {
 		v.Log.Warn("failed to start vlc player", zap.Error(err))
@@ -45,7 +49,7 @@ func (v *VlcManager) playStream(c *gin.Context) {
 
 	Player = vlcPlayer
 
-	err = helpers.SwitchStream(vlcPlayer, streamURL)
+	err = helpers.SwitchStream(Player, stream.URL)
 	if err != nil {
 		v.Log.Warn("failed to switch stream", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, err)

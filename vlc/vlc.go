@@ -17,7 +17,7 @@ func (v *VlcManager) RunHTTPServer(router *gin.Engine, port string) error {
 
 	// endpoints
 	vlc := router.Group("/api/v1")
-	vlc.GET("/play/:streamURL", v.playStream)
+	vlc.PUT("/play", v.playStream)
 	vlc.GET("/stop", v.stopStream)
 	vlc.GET("/status", v.getStatus)
 	vlc.GET("/stream", v.getStream)

@@ -10,8 +10,11 @@ require (
 
 require github.com/adrg/libvlc-go/v3 v3.1.5
 
+require golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
+
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
+	github.com/go-kivik/kivik/v3 v3.2.3
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.11.1 // indirect

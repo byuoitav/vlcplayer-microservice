@@ -64,6 +64,27 @@ func SwitchStream(player *vlc.Player, stream string) error {
 	}
 	defer media.Release()
 
+	manager, err := player.EventManager()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	quit := make(chan struct{})
+	eventCallback := func(event vlc.Event, userData interface{}) {
+		close(quit)
+	}
+
+	eventID, err := manager.Attach(vlc.MediaPlayerEndReached, eventCallback, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer manager.Detach(eventID)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer manager.Detach(eventID)
+
 	err = player.Play()
 	if err != nil {
 		log.Printf("error playing media: %s", err)
