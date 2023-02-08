@@ -8,6 +8,10 @@ import (
 	kivik "github.com/go-kivik/kivik/v3"
 )
 
+const (
+	_StreamConfigDoc = "streams"
+)
+
 type ConfigService struct {
 	Client         *kivik.Client
 	StreamConfigDB string

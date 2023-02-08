@@ -1,10 +1,17 @@
 package vlc
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
+	"fmt"
+	"io"
 	"net/http"
 	"strconv"
+	"strings"
+	"time"
 
 	vlc "github.com/adrg/libvlc-go/v3"
+	"github.com/byuoitav/vlcplayer-microservice/data"
 	"github.com/byuoitav/vlcplayer-microservice/vlc/helpers"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -14,6 +21,11 @@ var Player *vlc.Player
 
 type StreamURL struct {
 	URL string `json:"url"`
+}
+
+type Handlers struct {
+	ConfigService     data.ConfigService
+	ControlConfigPath string
 }
 
 func (v *VlcManager) startVLC() (*vlc.Player, error) {
@@ -183,4 +195,36 @@ func (v *VlcManager) unmuteStream(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, "stream unmuted")
+}
+
+/*
+Example of a stream URL:
+https://streaming-stg.byu.edu:8443/live-stream01/stream01/playlist.m3u8?zbyutokenstarttime=1675881066&zbyutokenendtime=1675917066&zbyutokenhash=_Y5WqFc8VwT0ahWYWO9Trj-4Wz8Ap7NXjP_gfyENW_k=
+*/
+
+// generateToken generates a token for the encrypted streams
+func (v *VlcManager) generateToken(stream data.Stream) (string, error) {
+	duration, err := time.ParseDuration(stream.Duration)
+	if err != nil {
+		v.Log.Warn("failed to parse duration", zap.Error(err))
+		return "", err
+	}
+
+	start := time.Now().UTC()
+	end := start.Add(duration)
+
+	url := fmt.Sprintf("%s?%s&%sendtime=%d&%sstarttime=%d", stream.URL, stream.Secret, stream.QueryPrefix, end.Unix(), stream.QueryPrefix, start.Unix())
+	input := strings.NewReader(url)
+	hash := sha256.New()
+
+	if _, err := io.Copy(hash, input); err != nil {
+		v.Log.Warn("failed to copy hash", zap.Error(err))
+		return "", err
+	}
+
+	finalHash := string(base64.StdEncoding.EncodeToString(hash.Sum(nil)))
+	finalHash = strings.ReplaceAll(finalHash, "+", "-")
+	finalHash = strings.ReplaceAll(finalHash, "/", "_")
+
+	return fmt.Sprintf("?%sstarttime=%d&%sendtime=%d&%shash=%s", stream.QueryPrefix, start.Unix(), stream.QueryPrefix, end.Unix(), stream.QueryPrefix, finalHash), nil
 }
