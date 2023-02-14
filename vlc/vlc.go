@@ -15,7 +15,9 @@ import (
 )
 
 type VlcManager struct {
-	Log *zap.Logger
+	Log               *zap.Logger
+	ConfigService     data.ConfigService
+	ControlConfigPath string
 }
 
 func (v *VlcManager) RunHTTPServer(router *gin.Engine, port string) error {
@@ -49,10 +51,8 @@ func (v *VlcManager) RunHTTPServer(router *gin.Engine, port string) error {
 		v.Log.Info("succesfully connected to config service")
 	}
 
-	h := Handlers{
-		ConfigService:     configService,
-		ControlConfigPath: os.Getenv("CONTROL_CONFIG_PATH"),
-	}
+	v.ConfigService = configService
+	v.ControlConfigPath = os.Getenv("CONTROL_CONFIG_PATH")
 
 	// endpoints
 	vlc := router.Group("/api/v1")

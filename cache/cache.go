@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/byuoitav/vlcplayer-microservice/data"
 	bolt "go.etcd.io/bbolt"
@@ -56,7 +57,7 @@ func (c *configService) GetStreamConfig(ctx context.Context, streamURL string) (
 	if err != nil {
 		stream, cacheErr := c.streamConfigFromCache(ctx, streamURL)
 		if cacheErr != nil {
-			fmt.Errorf("unable to get stream from cache: %w", cacheErr)
+			log.Printf("unable to get stream from cache: %s", cacheErr.Error())
 			return stream, err
 		}
 
@@ -64,7 +65,7 @@ func (c *configService) GetStreamConfig(ctx context.Context, streamURL string) (
 	}
 
 	if err := c.cacheStream(ctx, streamURL, stream); err != nil {
-		fmt.Errorf("unable to cache stream: %w", err)
+		log.Printf("unable to cache stream: %s", err.Error())
 	}
 
 	return stream, nil
@@ -130,7 +131,7 @@ func (c *configService) GetDeviceConfig(ctx context.Context, hostname string) (d
 	if err != nil {
 		device, cacheErr := c.deviceConfigFromCache(ctx, hostname)
 		if cacheErr != nil {
-			fmt.Errorf("unable to get device from cache: %w", cacheErr)
+			log.Printf("unable to get device from cache: %s", cacheErr.Error())
 			return device, err
 		}
 
@@ -138,7 +139,7 @@ func (c *configService) GetDeviceConfig(ctx context.Context, hostname string) (d
 	}
 
 	if err := c.cacheDevice(ctx, hostname, device); err != nil {
-		fmt.Errorf("unable to cache device %s: %w", hostname, err)
+		log.Printf("unable to cache device: %s", err.Error())
 	}
 
 	return device, nil

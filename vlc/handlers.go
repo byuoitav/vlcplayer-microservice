@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -23,11 +24,6 @@ type StreamURL struct {
 	URL string `json:"url"`
 }
 
-type Handlers struct {
-	ConfigService     data.ConfigService
-	ControlConfigPath string
-}
-
 func (v *VlcManager) startVLC() (*vlc.Player, error) {
 	v.Log.Debug("starting vlc player")
 
@@ -43,12 +39,30 @@ func (v *VlcManager) startVLC() (*vlc.Player, error) {
 func (v *VlcManager) playStream(c *gin.Context) {
 	v.Log.Debug("playing stream")
 
-	var stream StreamURL
-	err := c.ShouldBindJSON(&stream)
-	if err != nil {
-		v.Log.Warn("failed to bind json", zap.Error(err))
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	streamURL := c.Param("streamURL")
+	var args []string
+
+	if v.ConfigService != nil {
+		stream, err := v.ConfigService.GetStreamConfig(c.Request.Context(), streamURL)
+		if err == nil && stream.Secret != "" {
+			// the token is everything after the base URL
+			token, err := v.generateToken(stream)
+			if err != nil {
+				v.Log.Error("error generating secure token: %s", zap.Error(err))
+				c.JSON(http.StatusInternalServerError, err)
+				return
+			}
+			v.Log.Info("generated secure token", zap.String("token", token))
+			streamURL += token
+		}
+
+		hostname, err := os.Hostname()
+		if err == nil {
+			device, err := v.ConfigService.GetDeviceConfig(c.Request.Context(), hostname)
+			if err == nil {
+				args = device.Args
+			}
+		}
 	}
 
 	vlcPlayer, err := helpers.StartVLC()
@@ -61,7 +75,7 @@ func (v *VlcManager) playStream(c *gin.Context) {
 
 	Player = vlcPlayer
 
-	err = helpers.SwitchStream(Player, stream.URL)
+	err = helpers.SwitchStream(Player, streamURL)
 	if err != nil {
 		v.Log.Warn("failed to switch stream", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, err)
