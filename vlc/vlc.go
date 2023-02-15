@@ -56,17 +56,17 @@ func (v *VlcManager) RunHTTPServer(router *gin.Engine, port string) error {
 
 	// endpoints
 	vlc := router.Group("/api/v1")
-	vlc.PUT("/play", v.playStream)
-	vlc.GET("/stop", v.stopStream)
-	vlc.GET("/status", v.getStatus)
+	vlc.GET("/stream/:streamURL", v.playStream)
+	vlc.GET("/stream/stop", v.stopStream)
 	vlc.GET("/stream", v.getStream)
+	vlc.GET("/status", v.getStatus)
 	vlc.GET("/volume", v.getVolume)
 	vlc.GET("/mute", v.muteStream)
 	vlc.GET("/unmute", v.unmuteStream)
 
 	server := &http.Server{
 		Addr:           port,
-		MaxHeaderBytes: 1021 * 10,
+		MaxHeaderBytes: 1024 * 10,
 	}
 
 	v.Log.Info("running http server")

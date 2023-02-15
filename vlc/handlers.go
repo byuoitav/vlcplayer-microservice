@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -40,7 +40,7 @@ func (v *VlcManager) playStream(c *gin.Context) {
 	v.Log.Debug("playing stream")
 
 	streamURL := c.Param("streamURL")
-	var args []string
+	fmt.Println("streamURL: ", streamURL)
 
 	if v.ConfigService != nil {
 		stream, err := v.ConfigService.GetStreamConfig(c.Request.Context(), streamURL)
@@ -56,13 +56,12 @@ func (v *VlcManager) playStream(c *gin.Context) {
 			streamURL += token
 		}
 
-		hostname, err := os.Hostname()
-		if err == nil {
-			device, err := v.ConfigService.GetDeviceConfig(c.Request.Context(), hostname)
-			if err == nil {
-				args = device.Args
-			}
-		}
+	}
+	streamURL, err := url.QueryUnescape(streamURL)
+	if err != nil {
+		v.Log.Warn("failed to unescape stream url", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, err)
+		return
 	}
 
 	vlcPlayer, err := helpers.StartVLC()

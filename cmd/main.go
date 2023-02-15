@@ -5,7 +5,6 @@ import (
 
 	"github.com/byuoitav/vlcplayer-microservice/vlc"
 	"github.com/gin-gonic/gin"
-
 	"github.com/spf13/pflag"
 )
 
