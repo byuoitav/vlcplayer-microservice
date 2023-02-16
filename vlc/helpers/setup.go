@@ -13,7 +13,7 @@ func StartVLC() (*vlc.Player, error) {
 	// Initialize libVLC. Additional command line arguments can be passed in
 	// to the libVLC by specifying them in the Init function.
 
-	if err := vlc.Init(); err != nil {
+	if err := vlc.Init("-vvv"); err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
