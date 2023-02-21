@@ -55,12 +55,33 @@ func StopStream(player *vlc.Player) error {
 
 // SwitchStream switches the player output to a new stream
 
-func SwitchStream(player *vlc.Player, stream string) error {
+func SwitchStream(player *vlc.Player, stream string) (*vlc.Player, error) {
+
+	// Initialize libVLC. Additional command line arguments can be passed in
+	// to the libVLC by specifying them in the Init function.
+	player.Release()
+
+	if err := vlc.Init("-vvv"); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer vlc.Release()
+
+	// Create a new player.
+	player, err := vlc.NewPlayer()
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer func() {
+		player.Stop()
+		player.Release()
+	}()
 
 	media, err := player.LoadMediaFromURL(stream)
 	if err != nil {
 		log.Printf("error loading media: %s", err)
-		return err
+		return nil, err
 	}
 	defer media.Release()
 
@@ -88,10 +109,9 @@ func SwitchStream(player *vlc.Player, stream string) error {
 	err = player.Play()
 	if err != nil {
 		log.Printf("error playing media: %s", err)
-		return err
+		return nil, err
 	}
-
-	return nil
+	return player, nil
 }
 
 // Volume returns the current volume level

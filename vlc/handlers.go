@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -24,22 +23,10 @@ type StreamURL struct {
 	URL string `json:"url"`
 }
 
-func (v *VlcManager) startVLC() (*vlc.Player, error) {
-	v.Log.Debug("starting vlc player")
-
-	player, err := helpers.StartVLC()
-	if err != nil {
-		v.Log.Warn("failed to start vlc player", zap.Error(err))
-		return nil, err
-	}
-	Player = player
-	return player, nil
-}
-
 func (v *VlcManager) playStream(c *gin.Context) {
 	v.Log.Debug("playing stream")
 
-	streamURL, err := ioutil.ReadAll(c.Request.Body)
+	streamURL, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		v.Log.Warn("failed to read request body", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, err)
@@ -65,17 +52,7 @@ func (v *VlcManager) playStream(c *gin.Context) {
 
 	}
 
-	vlcPlayer, err := helpers.StartVLC()
-	if err != nil {
-		v.Log.Warn("failed to start vlc player", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, err)
-		return
-
-	}
-
-	Player = vlcPlayer
-
-	err = helpers.SwitchStream(Player, url)
+	Player, err = helpers.SwitchStream(Player, url)
 	if err != nil {
 		v.Log.Warn("failed to switch stream", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, err)
