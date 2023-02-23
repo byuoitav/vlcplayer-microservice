@@ -26,15 +26,16 @@ type StreamURL struct {
 func (v *VlcManager) playStream(c *gin.Context) {
 	v.Log.Debug("playing stream")
 
-	streamURL, err := io.ReadAll(c.Request.Body)
+	// Get the infor from streamURL json
+	var streamURL StreamURL
+	err := c.BindJSON(&streamURL)
 	if err != nil {
-		v.Log.Warn("failed to read request body", zap.Error(err))
+		v.Log.Warn("failed to bind json", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-
-	url := string(streamURL)
-	fmt.Println("streamURL: ", url)
+	url := string(streamURL.URL)
+	fmt.Println("url: ", url)
 
 	if v.ConfigService != nil {
 		stream, err := v.ConfigService.GetStreamConfig(c.Request.Context(), url)
