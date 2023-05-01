@@ -211,7 +211,6 @@ func (v *VlcManager) generateToken(stream data.Stream) (string, error) {
 
 	if _, err := io.Copy(hash, input); err != nil {
 		v.Log.Warn("failed to copy hash", zap.Error(err))
-		return "", err
 	}
 
 	finalHash := string(base64.StdEncoding.EncodeToString(hash.Sum(nil)))
